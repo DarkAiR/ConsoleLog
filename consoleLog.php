@@ -46,8 +46,55 @@ class ConsoleLog
         'positive'          => 27,
     );
 
+    static private $indent = 0;
+    static private $isNewLine = true;       // Is line new? If yes than add indent
 
-    static public function output($val, $color=null, $bgcolor=null, $style=array())
+    static public function output($val, $useNewLine = true)
+    {
+        ob_start();
+        if (is_array($val)) {
+            print_r($val);
+        }
+        else
+        if (is_object($val) || is_resource($val)) {
+            var_dump($val);
+        }
+        else
+        if (is_bool($val)) {
+            echo $val ? 'true' : 'false';
+        }
+        else {
+            echo $val;
+        }
+        $content = ob_get_clean();
+
+        $indentStr = '';
+        for ($i=0; $i<self::$indent; $i++)
+            $indentStr .= '  ';
+
+        $res = explode(PHP_EOL, $content);
+        if (is_array($res) && count($res)>0)
+        {
+            $last = end($res);
+            $last = trim($last);
+            if (empty($last))
+                array_pop($res);
+        }
+
+        // Only on new string add indent. That's why stings whithout carrent return will be working.
+        foreach ($res as $str) {
+            if (self::$isNewLine)
+                echo $indentStr;
+            echo $str;
+            self::$isNewLine = false;
+            if ($useNewLine) {
+                echo PHP_EOL;
+                self::$isNewLine = true;
+            }
+        }
+    }
+
+    static public function setStyle($color=null, $bgcolor=null, $style=array())
     {
         $codes = array();
         if ($color !== null  &&  isset(self::$color[$color]))
@@ -62,24 +109,26 @@ class ConsoleLog
         }
         if (!empty($codes))
             echo "\033[".implode(';', $codes).'m';
+    }
 
-        if (is_array($val)) {
-            print_r($val);
-        }
-        else
-        if (is_object($val) || is_resource($val)) {
-            var_dump($val);
-        }
-        else
-        if (is_bool($val)) {
-            echo $val ? 'true' : 'false';
-            echo PHP_EOL;
-        }
-        else {
-            echo $val.PHP_EOL;
-        }
+    static public function resetStyle()
+    {
+        echo "\033[0m";
+    }
 
-        if (!empty($codes))
-            echo "\033[0m";
+    static public function addIndent()
+    {
+        self::$indent++;
+    }
+
+    static public function removeIndent()
+    {
+        if (self::$indent > 0)
+            self::$indent--;
+    }
+
+    static public function removeAllIndent()
+    {
+        self::$indent = 0;
     }
 }

@@ -3,14 +3,34 @@ ConsoleLog
 
 PHP class for output strings, objects, etc. to terminal (console) with colors, background colors and styles.
 
-Use
----
+Output
+------
 
 ```php
 // Output green string on yellow background with bold and negative styles
 $var = 'foo string';
-ConsoleLog::output( $obj, 'green', 'yellow', array('bold', 'negative'));
+ConsoleLog::output( $obj );
 ```
+
+
+Indents
+-------
+
+```php
+ConsoleLog::addIndent();
+ConsoleLog::output('smth');
+ConsoleLog::removeIndent();
+```
+
+
+Styles
+------
+
+```php
+ConsoleLog::setStyle('green', 'yellow', array('bold', 'negative'));     // color, bgcolor, array(styles)
+ConsoleLog::output('smth');
+ConsoleLog::resetStyle();
+
 
 
 List of colors, backgrounds and styles:
