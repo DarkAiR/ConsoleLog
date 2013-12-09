@@ -47,6 +47,7 @@ class ConsoleLog
     );
 
     static private $indent = 0;
+    static private $prevStyle = '';         // Previous style
     static private $isNewLine = true;       // Is line new? If yes than add indent
 
     static public function output($val, $useNewLine = true)
@@ -94,6 +95,48 @@ class ConsoleLog
         }
     }
 
+    static public function ok($useNewLine = true)
+    {
+        self::outputOk($useNewLine);
+    }
+    static public function outputOk($useNewLine = true)
+    {
+        $prevStyle = self::$prevStyle;
+        self::setStyle('green');
+        self::output('OK!', $useNewLine);
+        self::resetStyle();
+        self::$prevStyle = $prevStyle;
+        echo $prevStyle;
+    }
+
+    static public function error($str, $useNewLine = true)
+    {
+        self::outputError($str, $useNewLine);
+    }
+    static public function outputError($str, $useNewLine = true)
+    {
+        $prevStyle = self::$prevStyle;
+        self::setStyle('red');
+        self::output($str, $useNewLine);
+        self::resetStyle();
+        self::$prevStyle = $prevStyle;
+        echo $prevStyle;
+    }
+
+    static public function warning($str, $useNewLine = true)
+    {
+        self::outputWarning($str, $useNewLine);
+    }
+    static public function outputWarning($str, $useNewLine = true)
+    {
+        $prevStyle = self::$prevStyle;
+        self::setStyle('yellow');
+        self::output($str, $useNewLine);
+        self::resetStyle();
+        self::$prevStyle = $prevStyle;
+        echo $prevStyle;
+    }
+
     static public function setStyle($color=null, $bgcolor=null, $style=array())
     {
         $codes = array();
@@ -107,13 +150,16 @@ class ConsoleLog
                     $codes[] = self::$style[$v];
             }
         }
-        if (!empty($codes))
-            echo "\033[".implode(';', $codes).'m';
+        if (!empty($codes)) {
+            self::$prevStyle = "\033[".implode(';', $codes).'m';
+            echo self::$prevStyle;
+        }
     }
 
     static public function resetStyle()
     {
         echo "\033[0m";
+        self::$prevStyle = '';
     }
 
     static public function addIndent()
