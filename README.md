@@ -30,7 +30,7 @@ Styles
 ConsoleLog::setStyle('green', 'yellow', array('bold', 'negative'));     // color, bgcolor, array(styles)
 ConsoleLog::output('smth');
 ConsoleLog::resetStyle();
-
+```
 
 
 List of colors, backgrounds and styles:
