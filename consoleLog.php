@@ -77,7 +77,6 @@ class ConsoleLog
         if (is_array($res) && count($res)>0)
         {
             $last = end($res);
-            $last = trim($last);
             if (empty($last))
                 array_pop($res);
         }
@@ -95,11 +94,16 @@ class ConsoleLog
         }
     }
 
-    static public function ok($useNewLine = true)
+    /**
+     * Output end of line
+     * @return void
+     */
+    static public function eol()
     {
-        self::outputOk($useNewLine);
+        self::output(' ');
     }
-    static public function outputOk($useNewLine = true)
+
+    static public function ok($useNewLine = true)
     {
         $prevStyle = self::$prevStyle;
         self::setStyle('green');
@@ -111,10 +115,6 @@ class ConsoleLog
 
     static public function error($str, $useNewLine = true)
     {
-        self::outputError($str, $useNewLine);
-    }
-    static public function outputError($str, $useNewLine = true)
-    {
         $prevStyle = self::$prevStyle;
         self::setStyle('red');
         self::output($str, $useNewLine);
@@ -125,12 +125,18 @@ class ConsoleLog
 
     static public function warning($str, $useNewLine = true)
     {
-        self::outputWarning($str, $useNewLine);
-    }
-    static public function outputWarning($str, $useNewLine = true)
-    {
         $prevStyle = self::$prevStyle;
         self::setStyle('yellow');
+        self::output($str, $useNewLine);
+        self::resetStyle();
+        self::$prevStyle = $prevStyle;
+        echo $prevStyle;
+    }
+
+    static public function title($str, $useNewLine = true)
+    {
+        $prevStyle = self::$prevStyle;
+        self::setStyle('cyan');
         self::output($str, $useNewLine);
         self::resetStyle();
         self::$prevStyle = $prevStyle;
