@@ -49,6 +49,8 @@ class ConsoleLog
     static private $indent = 0;
     static private $prevStyle = '';         // Previous style
     static private $isNewLine = true;       // Is line new? If yes than add indent
+    static private $startTime = 0;
+
 
     static public function output($val, $useNewLine = true)
     {
@@ -152,7 +154,6 @@ class ConsoleLog
      */
     static public function progress($str, $done, $total, $size=30)
     {
-        static $startTime;
         if( $done <= 0 )
             $done = 1;
 
@@ -160,8 +161,8 @@ class ConsoleLog
         if ($done > $total)
             return;
 
-        if (empty($startTime))
-            $startTime = time();
+        if (empty(self::$startTime))
+            self::$startTime = time();
         $now = time();
 
         $perc = (double) ($done/$total);
@@ -178,21 +179,23 @@ class ConsoleLog
         }
         $statusBar .= "] $disp%  $done/$total";
 
-        $rate = ($now-$startTime) / $done;
+        $rate = ($now - self::$startTime) / $done;
         $left = $total - $done;
         $eta = round($rate * $left, 2);
 
-        $elapsed = $now - $startTime;
+        $elapsed = $now - self::$startTime;
 
         $statusBar .= " remaining: ".number_format($eta)." sec.  elapsed: ".number_format($elapsed)." sec.";
 
         self::output("\r", false);
         self::$isNewLine = true;
-        self::output($statusBar, false);
+        self::output($statusBar.'  ', false);
 
         // В конце посылаем перевод строки
-        if ($done == $total)
+        if ($done == $total) {
+            self::$startTime = 0;
             self::eol();
+        }
     }
 
     static public function setStyle($color=null, $bgcolor=null, $style=array())
