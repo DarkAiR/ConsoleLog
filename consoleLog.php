@@ -69,9 +69,7 @@ class ConsoleLog
         }
         $content = ob_get_clean();
 
-        $indentStr = '';
-        for ($i=0; $i<self::$indent; $i++)
-            $indentStr .= '  ';
+        $indentStr = str_repeat('  ', self::$indent);
 
         $res = explode(PHP_EOL, $content);
         if (is_array($res) && count($res)>0)
@@ -141,6 +139,60 @@ class ConsoleLog
         self::resetStyle();
         self::$prevStyle = $prevStyle;
         echo $prevStyle;
+    }
+
+    /**
+     * Показывает прогресс бар в консоли
+     *
+     * @param  string $str
+     * @param  int  $done  how many items are completed
+     * @param  int  $total how many items are to be done total
+     * @param  int  $size  optional size of the status bar
+     * @return void
+     */
+    static public function progress($str, $done, $total, $size=30)
+    {
+        static $startTime;
+        if( $done <= 0 )
+            $done = 1;
+
+        // if we go over our bound, just ignore it
+        if ($done > $total)
+            return;
+
+        if (empty($startTime))
+            $startTime = time();
+        $now = time();
+
+        $perc = (double) ($done/$total);
+        $bar  = floor($perc*$size);
+        $disp = number_format($perc*100, 0);
+
+        $statusBar = $str." [";
+        $statusBar .= str_repeat("=", $bar);
+        if ($bar<$size) {
+            $statusBar .= ">";
+            $statusBar .= str_repeat(" ", $size-$bar);
+        } else {
+            $statusBar .= "=";
+        }
+        $statusBar .= "] $disp%  $done/$total";
+
+        $rate = ($now-$startTime) / $done;
+        $left = $total - $done;
+        $eta = round($rate * $left, 2);
+
+        $elapsed = $now - $startTime;
+
+        $statusBar .= " remaining: ".number_format($eta)." sec.  elapsed: ".number_format($elapsed)." sec.";
+
+        self::output("\r", false);
+        self::$isNewLine = true;
+        self::output($statusBar, false);
+
+        // В конце посылаем перевод строки
+        if ($done == $total)
+            self::eol();
     }
 
     static public function setStyle($color=null, $bgcolor=null, $style=array())
