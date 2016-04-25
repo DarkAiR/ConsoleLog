@@ -6,11 +6,40 @@ PHP class for output strings, objects, etc. to terminal (console) with colors, b
 Output
 ------
 
+####Simple output
+
 ```php
-// Output green string on yellow background with bold and negative styles
-$var = 'foo string';
-ConsoleLog::output( $obj );
+$obj = <standart type, array, object>
+ConsoleLog::output($obj);
 ```
+
+####Extended output
+```php
+ConsoleLog::title('Cyan title');
+ConsoleLog::warning('Yellow warning');
+ConsoleLog::error('Red error');
+ConsoleLog::ok();   // green OK
+```
+
+Any output methods has last parameter $useNewLine=true, which automatically added new line at the end of the line. Thats why you can write difficult output like:
+
+```php
+ConsoleLog::title('Title withoud EOL ', false);
+ConsoleLog::warning('Warning without EOL ', false);
+ConsoleLog::eol();
+
+ConsoleLog::output('Text without EOL ', false);
+ConsoleLog::ok();       // output green OK and EOL
+```
+
+Progress bar
+------------
+
+```php
+ConsoleLog::progress('Some process text', $currentIdx, $totalIdx, $progressWidth);
+```
+
+NOTE: ```$currentIdx``` and ```$totalIdx``` started at 1.
 
 
 Indents
